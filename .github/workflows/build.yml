@@ -29,9 +29,11 @@ jobs:
       # CommonLibSSE — cloned into extern/CommonLibSSE so
       # find_dependency_path() in CMakeLists.txt finds it automatically
       # without any env-var override.
+      # --recurse-submodules is required: CommonLibVR vendors OpenVR at
+      # extern/openvr and the build will fail without it.
       - name: Clone CommonLibSSE (alandtse/CommonLibVR v4.7.0)
         run: |
-          git clone --depth 1 --branch v4.7.0 `
+          git clone --depth 1 --branch v4.7.0 --recurse-submodules --shallow-submodules `
             https://github.com/alandtse/CommonLibVR.git `
             extern/CommonLibSSE
         shell: pwsh
