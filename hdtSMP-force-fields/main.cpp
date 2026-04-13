@@ -1,6 +1,12 @@
 #include "PluginHelper.h"
 #include "hooks.h"
 
+SKSEPluginInfo(
+	.Version = { 0, 9, 1, 0 },
+	.Name = "HDT-SMP Force Fields",
+	.Author = "jgernandt",
+	.RuntimeCompatibility = SKSE::VersionIndependence::AddressLibrary)
+
 static void InitializeLog(std::string_view pluginName)
 {
 #ifndef NDEBUG

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat \"e:/dev/SMP Force Fields/cmake/ports/\"*/portfile.cmake)",
+      "Bash(cmake --preset ALL)",
+      "Bash(git -C \"e:/dev/vcpkg\" rev-parse HEAD)",
+      "Bash(cmake --build build --config Release)"
+    ]
+  }
+}

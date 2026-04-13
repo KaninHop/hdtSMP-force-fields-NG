@@ -31,8 +31,13 @@ jg::ForceFieldManager::ForceFieldManager() :
 	}
 }
 
-void jg::ForceFieldManager::onEvent(const hdt::PreStepEvent& e)
+RE::BSEventNotifyControl jg::ForceFieldManager::ProcessEvent(const hdt::PreStepEvent* a_event, RE::BSTEventSource<hdt::PreStepEvent>*)
 {
+	if (!a_event) {
+		return RE::BSEventNotifyControl::kContinue;
+	}
+	const hdt::PreStepEvent& e = *a_event;
+
 #ifdef LOG_TIMER
 	static std::size_t fields = 0;
 	static int objects = 0;
@@ -112,6 +117,7 @@ void jg::ForceFieldManager::onEvent(const hdt::PreStepEvent& e)
 #endif
 
 	m_active.clear();
+	return RE::BSEventNotifyControl::kContinue;
 }
 
 void jg::ForceFieldManager::onDetach(RE::NiAVObject* model, void* owner)

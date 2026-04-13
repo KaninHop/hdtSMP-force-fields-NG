@@ -45,8 +45,8 @@ namespace hdt
 		}
 	private:
 
-		inline static hdt::PluginInterface::Version interfaceMin{ 1, 0, 0 };
-		inline static hdt::PluginInterface::Version interfaceMax{ 2, 0, 0 };
+		inline static hdt::PluginInterface::Version interfaceMin{ 2, 0, 0 };
+		inline static hdt::PluginInterface::Version interfaceMax{ 3, 0, 0 };
 
 		inline static hdt::PluginInterface::Version bulletMin{ hdt::PluginInterface::BULLET_VERSION };
 		inline static hdt::PluginInterface::Version bulletMax{ hdt::PluginInterface::BULLET_VERSION.major + 1, 0, 0 };

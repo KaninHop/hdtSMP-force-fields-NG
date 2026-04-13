@@ -9,10 +9,10 @@
 		{
 			"name": "common",
 			"hidden": true,
-			"cacheVariables": {
-				"SKSE_SUPPORT_XBYAK": "ON"
-			},
-			"binaryDir": "${sourceDir}/build"
+			"binaryDir": "${sourceDir}/build",
+			"environment": {
+				"CommonLibSSEPath_NG": "E:/dev/htdSMP64/extern/CommonLibSSE"
+			}
 		},
 		{
 			"name": "vcpkg",

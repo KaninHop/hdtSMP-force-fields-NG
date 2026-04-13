@@ -7,7 +7,7 @@ namespace jg
 	struct obj_traits<RE::Explosion> : obj_traits<RE::TESObjectREFR>
 	{
 		constexpr static bool hasAge() { return true; }
-		static float age(const RE::Explosion& obj) { return obj.startKeyTime; }
+		static float age(const RE::Explosion& obj) { return obj.GetExplosionRuntimeData().age; }
 
 		//static float duration(const Explosion& obj) { return obj.getDuration(); }//explosion duration is not used?
 
@@ -19,6 +19,6 @@ namespace jg
 		}
 
 		static float length(const RE::Explosion& obj) { return radius(obj); }
-		static float radius(const RE::Explosion& obj) { return obj.radius; }
+		static float radius(const RE::Explosion& obj) { return obj.GetExplosionRuntimeData().radius; }
 	};
 }

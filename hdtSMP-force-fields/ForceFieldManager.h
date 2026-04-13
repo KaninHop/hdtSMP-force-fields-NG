@@ -8,7 +8,7 @@
 
 namespace jg
 {
-	class ForceFieldManager final : public hdt::IPreStepListener
+	class ForceFieldManager final : public RE::BSTEventSink<hdt::PreStepEvent>
 	{
 	private:
 		using Bodies = std::remove_const_t<std::remove_reference_t<decltype(hdt::PreStepEvent::objects)>>;
@@ -53,7 +53,7 @@ namespace jg
 		ForceFieldManager();
 		~ForceFieldManager() = default;
 
-		virtual void onEvent(const hdt::PreStepEvent& e) override;
+		virtual RE::BSEventNotifyControl ProcessEvent(const hdt::PreStepEvent* a_event, RE::BSTEventSource<hdt::PreStepEvent>* a_eventSource) override;
 
 		template<typename T> void onAttach(RE::NiAVObject* model, T* owner);
 		void onDetach(RE::NiAVObject* model, void* owner);
