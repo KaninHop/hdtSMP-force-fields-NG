@@ -1,0 +1,116 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["v*"]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-2022
+
+    # Needed so the release step can create/upload assets
+    permissions:
+      contents: write
+
+    steps:
+      # ------------------------------------------------------------------ #
+      # Source
+      # ------------------------------------------------------------------ #
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # CommonLibSSE — cloned into extern/CommonLibSSE so
+      # find_dependency_path() in CMakeLists.txt finds it automatically
+      # without any env-var override.
+      - name: Clone CommonLibSSE (alandtse/CommonLibVR v4.7.0)
+        run: |
+          git clone --depth 1 --branch v4.7.0 `
+            https://github.com/alandtse/CommonLibVR.git `
+            extern/CommonLibSSE
+        shell: pwsh
+
+      # ------------------------------------------------------------------ #
+      # vcpkg  (lukka/run-vcpkg handles bootstrap + GHA cache automatically)
+      # ------------------------------------------------------------------ #
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          # Pin to the same commit used as builtin-baseline in vcpkg.json
+          vcpkgGitCommitId: c27eeddba73f608f10605d80bc0144c1166f8fb7
+
+      # ------------------------------------------------------------------ #
+      # Build
+      # ------------------------------------------------------------------ #
+      - name: Configure CMake
+        run: cmake --preset ALL
+        shell: pwsh
+
+      - name: Build (Release)
+        run: cmake --build build --config Release --parallel
+        shell: pwsh
+
+      # ------------------------------------------------------------------ #
+      # Package
+      # ------------------------------------------------------------------ #
+      - name: Determine version string
+        id: version
+        run: |
+          if ("${{ github.ref }}" -match '^refs/tags/v') {
+            $ver = "${{ github.ref_name }}"
+          } else {
+            $ver = "dev-$("${{ github.sha }}".Substring(0, 7))"
+          }
+          "tag=$ver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        shell: pwsh
+
+      - name: Create mod package
+        id: package
+        run: |
+          $zip = "HDT-SMP-Force-Fields-${{ steps.version.outputs.tag }}.zip"
+
+          # Vortex / MO2 expect this folder structure inside the archive
+          New-Item -ItemType Directory -Force "pkg/SKSE/Plugins" | Out-Null
+
+          Copy-Item "build/Release/HDT-SMP Force Fields.dll" "pkg/SKSE/Plugins/"
+
+          # Default INI ships with the mod so users can see all settings
+          if (Test-Path "HDT-SMP Force Fields.ini") {
+            Copy-Item "HDT-SMP Force Fields.ini" "pkg/SKSE/Plugins/"
+          }
+
+          # PDB enables crash-log symbol resolution (Crash Logger, NetScriptFramework)
+          if (Test-Path "build/Release/HDT-SMP Force Fields.pdb") {
+            Copy-Item "build/Release/HDT-SMP Force Fields.pdb" "pkg/SKSE/Plugins/"
+          }
+
+          Compress-Archive -Path "pkg/SKSE" -DestinationPath $zip -CompressionLevel Optimal
+
+          "zip=$zip" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        shell: pwsh
+
+      # ------------------------------------------------------------------ #
+      # Publish
+      # ------------------------------------------------------------------ #
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HDT-SMP-Force-Fields-${{ steps.version.outputs.tag }}
+          path: ${{ steps.package.outputs.zip }}
+          if-no-files-found: error
+
+      # Runs only on version tags (v1.0.0, v0.9.2-beta, etc.)
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: HDT-SMP Force Fields ${{ github.ref_name }}
+          files: ${{ steps.package.outputs.zip }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true

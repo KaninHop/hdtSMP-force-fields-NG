@@ -4,7 +4,17 @@
       "Bash(cat \"e:/dev/SMP Force Fields/cmake/ports/\"*/portfile.cmake)",
       "Bash(cmake --preset ALL)",
       "Bash(git -C \"e:/dev/vcpkg\" rev-parse HEAD)",
-      "Bash(cmake --build build --config Release)"
+      "Bash(cmake --build build --config Release)",
+      "Bash(git -C \"/e/dev/htdSMP64/extern/CommonLibSSE\" remote -v)",
+      "Bash(git -C \"/e/dev/htdSMP64/extern/CommonLibSSE\" log --oneline -3)",
+      "Bash(git -C \"/e/dev/htdSMP64/extern/CommonLibSSE\" describe --tags)",
+      "Bash(git -C \"/e/dev/htdSMP64/extern/CommonLibSSE\" rev-parse HEAD)",
+      "Bash(python3 -c ':*)",
+      "Bash(python -c ':*)",
+      "Bash(node -e ':*)",
+      "Bash(git ls-remote:*)",
+      "Bash(grep -v \"\\\\\\\\^{}\")",
+      "Bash(cmake --build build --config Release --parallel)"
     ]
   }
 }

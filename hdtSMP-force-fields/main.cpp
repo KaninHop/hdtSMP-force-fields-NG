@@ -1,11 +1,17 @@
 #include "PluginHelper.h"
 #include "hooks.h"
 
-SKSEPluginInfo(
-	.Version = { 0, 9, 1, 0 },
-	.Name = "HDT-SMP Force Fields",
-	.Author = "jgernandt",
-	.RuntimeCompatibility = SKSE::VersionIndependence::AddressLibrary)
+// SKSE_EXPORT = extern "C" [[maybe_unused]] __declspec(dllexport)
+// Compatible with all CommonLibSSE-NG forks (powerof3, CharmedBaryon, alandtse, …).
+SKSE_EXPORT constinit auto SKSEPlugin_Version = []() noexcept {
+	SKSE::PluginVersionData v;
+	v.PluginVersion({ 0, 9, 1, 0 });
+	v.PluginName("HDT-SMP Force Fields");
+	v.AuthorName("jgernandt");
+	v.UsesAddressLibrary();
+	v.UsesNoStructs();
+	return v;
+}();
 
 static void InitializeLog(std::string_view pluginName)
 {
@@ -37,20 +43,14 @@ static void InitializeLog(std::string_view pluginName)
 
 SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 {
-	const auto plugin{ SKSE::PluginDeclaration::GetSingleton() };
-	const auto name{ plugin->GetName() };
-	const auto version{ plugin->GetVersion() };
+	const auto  name = SKSEPlugin_Version.GetPluginName();
+	const auto  version = SKSEPlugin_Version.GetPluginVersion();
 
 	InitializeLog(name);
 
 	logger::info("{} {} is loading...", name, version);
 
 	SKSE::Init(a_skse);
-
-	if (REL::Module::IsVR())
-	{
-		REL::IDDatabase::get().IsVRAddressLibraryAtLeastVersion("0.135.0", true);
-	}
 
 	logger::info("Attaching engine hooks...");
 	if (Hooks::Install()) {
